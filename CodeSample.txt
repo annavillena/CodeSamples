@@ -1,23 +1,17 @@
 This code is from a C++ project where data about lego sets was loaded from a file and stored so that a user can search information
-about the lego set, like which set is most expensive, price information, part count, etc.
+about the lego set, like which set is most expensive, price information, part count, etc. I chose this code sample because it was a project I had worked on before I learned about other data structures and at this point I had only stored data using vectors. I wanted
+to use this code sample because I could find multiple ways it could be improved.
 
 In the code sample below, I included the struct I used to create a LegoSet object to store the data about the lego set.
-
 One of the search options that had to be implemented was to be able to list all of the lego sets with a name or theme containing a given keyword.
 Ex/ Sets matching "Fire Station" : 49281 Fire Station $19.99, 9381 Big Fire Station $49.99
 If no set is found, return "No sets found matching that search term"
 
-I originally used a vector to store all of the lego sets created. To find the names containing the keyword, I iterated through the vector with a for-loop
-and used getters to extract the name or theme of the lego set. Then I compared the name or theme string to the keyword to see if there was a match.
-If the keyword was found, the lego set was added to another vector that contains all of the sets containing the keyword.
+I originally used a vector to store all of the lego sets created. To find the names containing the keyword, I iterated through the vector with a for-loop and used getters to extract the name or theme of the lego set. Then I compared the name or theme string to the keyword to see if there was a match. If the keyword was found, the lego set was added to another vector that contains all of the sets containing the keyword.
 
-This code can definitely be improved because the worst-case complexity due to the iteration through the vector is O(n) with n being the total number of lego sets 
-in the data. In order to improve this, the names of the lego sets could be placed in a hash table as the key. The value could then be the actual LegoSet object
-corresponding to the name. Then finding the key containing the keyword could be done with O(1) complexity.
-An alternative way to approach this would be to collect a list of the most searched keywords. Those words could act as the keys and the value could be a linked list
-of all of the lego set objects containing that keyword. Then, the linked list is already the list of sets that satisfies the search.
-Another obvious solution to storing a large amount of data about these sets would be to use a database like SQL and then have columns for each
-attribute that needs to be recorded. A lego set model object could be created and one could retrieve or record any information about the set easily.
+This code can definitely be improved because the worst-case complexity due to the iteration through the vector is O(n) with n being the total number of lego sets in the data. In order to improve this, the names of the lego sets could be placed in a hash table as the key. The value could then be the actual LegoSet object corresponding to the name. Then finding the key containing the keyword could be done with O(1) complexity.
+An alternative way to approach this would be to collect a list of the most searched keywords. Those words could act as the keys and the value could be a linked list of all of the lego set objects containing that keyword. Then, the linked list is already the list of sets that satisfies the search.
+Another obvious solution to storing a large amount of data about these sets would be to use a database like SQL and then have columns for each attribute that needs to be recorded. A lego set model object could be created and one could retrieve or record any information about the set easily.
 
 //LegoSet object which stores information:
 struct LegoSet {
@@ -165,11 +159,11 @@ vector<LegoSet> findMatchingNameorTheme(vector<LegoSet>& legoSetList, string key
 	vector<LegoSet> themeMatch;
 	if (choice == 3) { //Finding set names with keyword
 		for (int i = 0; i < (signed)legoSetList.size(); i++) {
-			if (legoSetList[i].getName().find(keyword) != string::npos) { //If find is equal to npos (end of string), set does NOT contain keyword.
+			if (legoSetList[i].getName().find(keyword) != string::npos) { //If find == end of string, keyword is not found
 				nameMatch.push_back(legoSetList[i]);
 			}
 		}
-		return nameMatch;
+		return nameMatch; //New vector with the lego sets containing keyword in name
 	}
 	else { //Finding theme names with keyword
 		for (int i = 0; i < (signed)legoSetList.size(); i++) {
@@ -177,6 +171,6 @@ vector<LegoSet> findMatchingNameorTheme(vector<LegoSet>& legoSetList, string key
 				themeMatch.push_back(legoSetList[i]);
 			}
 		}
-		return themeMatch;
+		return themeMatch; //New vector with the lego sets containing keyword in name
 	}
 }
