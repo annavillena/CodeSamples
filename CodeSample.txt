@@ -1,0 +1,182 @@
+This code is from a C++ project where data about lego sets was loaded from a file and stored so that a user can search information
+about the lego set, like which set is most expensive, price information, part count, etc.
+
+In the code sample below, I included the struct I used to create a LegoSet object to store the data about the lego set.
+
+One of the search options that had to be implemented was to be able to list all of the lego sets with a name or theme containing a given keyword.
+Ex/ Sets matching "Fire Station" : 49281 Fire Station $19.99, 9381 Big Fire Station $49.99
+If no set is found, return "No sets found matching that search term"
+
+I originally used a vector to store all of the lego sets created. To find the names containing the keyword, I iterated through the vector with a for-loop
+and used getters to extract the name or theme of the lego set. Then I compared the name or theme string to the keyword to see if there was a match.
+If the keyword was found, the lego set was added to another vector that contains all of the sets containing the keyword.
+
+This code can definitely be improved because the worst-case complexity due to the iteration through the vector is O(n) with n being the total number of lego sets 
+in the data. In order to improve this, the names of the lego sets could be placed in a hash table as the key. The value could then be the actual LegoSet object
+corresponding to the name. Then finding the key containing the keyword could be done with O(1) complexity.
+An alternative way to approach this would be to collect a list of the most searched keywords. Those words could act as the keys and the value could be a linked list
+of all of the lego set objects containing that keyword. Then, the linked list is already the list of sets that satisfies the search.
+Another obvious solution to storing a large amount of data about these sets would be to use a database like SQL and then have columns for each
+attribute that needs to be recorded. A lego set model object could be created and one could retrieve or record any information about the set easily.
+
+//LegoSet object which stores information:
+struct LegoSet {
+	int number;
+	string theme;
+	string name;
+	int numMinifigs;
+	int numPieces;
+	float price;
+
+	LegoSet() {
+		number = 0;
+		theme = "";
+		name = "";
+		numMinifigs = 0;
+		numPieces = 0;
+		price = 0.0;
+	}
+
+	void setNumber(int number) {
+		this->number = number;
+	}
+	int getNumber() const {
+		return number;
+	}
+
+	void setTheme(string theme) {
+		this->theme = theme;
+	}
+	string getTheme() const {
+		return theme;
+	}
+
+	void setName(string name) {
+		this->name = name;
+	}
+	string getName() const {
+		return name;
+	}
+
+	void setNumMinifigs(int numMinifigs) {
+		this->numMinifigs = numMinifigs;
+	}
+	int getNumMinifigs() const {
+		return numMinifigs;
+	}
+
+	void setNumPieces(int numPieces) {
+		this->numPieces = numPieces;
+	}
+	int getNumPieces() const {
+		return numPieces;
+	}
+
+	void setPrice(float price) {
+		this->price = price;
+	}
+	float getPrice() const {
+		return price;
+	}
+};
+
+//Going through the file, creating a LegoSet object from each line, and adding that object to a vector
+void getLegoSetList(ifstream& file, vector<LegoSet>& legoSetList) {
+	string ignoreLine; //First line of file that should be ignored
+	string line; //The rest of the file lines
+	string strNumber;
+	int number;
+	string theme;
+	string name;
+	string strMinifigs;
+	int numMinifigs;
+	string strPieces;
+	int numPieces;
+	string strPrice;
+	float price;
+
+	getline(file, ignoreLine); //Skipping the first line
+	while (getline(file, line)) {
+		LegoSet legoSet;
+		stringstream streamline(line); //Creating a stream to read each line
+		//NUMBER
+		try {
+			getline(streamline, strNumber, ',');
+			number = stoi(strNumber);
+			legoSet.setNumber(number);
+		}
+		catch (invalid_argument plzNo) {
+			number = 0;
+		}
+		//THEME
+		try {
+			getline(streamline, theme, ',');
+			legoSet.setTheme(theme);
+		}
+		catch (invalid_argument plzNo) {
+			theme = "";
+		}
+		//NAME
+		try {
+			getline(streamline, name, ',');
+			legoSet.setName(name);
+		}
+		catch (invalid_argument plzNo) {
+			name = "";
+		}
+		//MINIFIGURES
+		try {
+			getline(streamline, strMinifigs, ',');
+			numMinifigs = stoi(strMinifigs);
+			legoSet.setNumMinifigs(numMinifigs);
+		}
+		catch (invalid_argument plzNo) {
+			numMinifigs = 0;
+		}
+		//PIECES
+		try {
+			getline(streamline, strPieces, ',');
+			numPieces = stoi(strPieces);
+			legoSet.setNumPieces(numPieces);
+		}
+		catch (invalid_argument plzNo) {
+			numPieces = 0;
+		}
+		//PRICE
+		try {
+			getline(streamline, strPrice, ',');
+			price = stof(strPrice);
+			legoSet.setPrice(price);
+		}
+		catch (invalid_argument plzNo) {
+			price = 0.0;
+		}
+
+		//Adding new lego set to list of all lego sets in the file
+		legoSetList.push_back(legoSet);
+	}
+
+	file.close();
+}
+
+//Function to find set names or theme names containing a given keyword 
+vector<LegoSet> findMatchingNameorTheme(vector<LegoSet>& legoSetList, string keyword, int choice) {
+	vector<LegoSet> nameMatch;
+	vector<LegoSet> themeMatch;
+	if (choice == 3) { //Finding set names with keyword
+		for (int i = 0; i < (signed)legoSetList.size(); i++) {
+			if (legoSetList[i].getName().find(keyword) != string::npos) { //If find is equal to npos (end of string), set does NOT contain keyword.
+				nameMatch.push_back(legoSetList[i]);
+			}
+		}
+		return nameMatch;
+	}
+	else { //Finding theme names with keyword
+		for (int i = 0; i < (signed)legoSetList.size(); i++) {
+			if (legoSetList[i].getTheme().find(keyword) != string::npos) {
+				themeMatch.push_back(legoSetList[i]);
+			}
+		}
+		return themeMatch;
+	}
+}
